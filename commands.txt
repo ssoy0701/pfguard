@@ -1,0 +1,102 @@
+## evalute celebA ====
+python train-classifier-celebA.py --data ../DataLens/[result_dir_name]/eps-1.00.data --gpu 1 --img_size 32 --num_train 10 --epoch 10
+======
+
+
+
+## G-PATE ========
+[MNIST, eps=10]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name]/ --teachers_batch 40 --batch_teachers 50 --dataset mnist --train --sigma_thresh 600 --sigma 100 --step_size 1e-4 --max_eps 10 --nopretrain --z_dim 100 --batch_size 64 --binary
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name]/ --teachers_batch 40 --batch_teachers 50 --dataset mnist --train --sigma_thresh 600 --sigma 100 --step_size 1e-4 --max_eps 10 --nopretrain --z_dim 100 --batch_size 64 --binary --resample --batch_size 15
+
+
+[FashionMNIST, eps=10]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name]/ --teachers_batch 40 --batch_teachers 50 --dataset fmnist --train --sigma_thresh 600 --sigma 100 --step_size 5e-5 --max_eps 10 --nopretrain --z_dim 100 --batch_size 64 --binary 
+
+PFGuard: 
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name]/ --teachers_batch 40 --batch_teachers 50 --dataset fmnist --train --sigma_thresh 600 --sigma 100 --step_size 5e-5 --max_eps 10 --nopretrain --z_dim 100 --batch_size 64 --binary --resample --batch_size 15
+
+
+[small-celebA-gender, eps=1]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name] --teachers_batch 80 --batch_teachers 50 --dataset small-celebA-gender-train --train --sigma_thresh 3000 --sigma 1000 --step_size 1e-4 --max_eps 1 --nopretrain --z_dim 100 --batch_size 64
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name] --teachers_batch 80 --batch_teachers 50 --dataset small-celebA-gender-train --train --sigma_thresh 3000 --sigma 1000 --step_size 1e-4 --max_eps 1 --nopretrain --z_dim 100 --batch_size 26 --resample
+
+
+[large-celebA-gender, eps=1]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name] --teachers_batch 80 --batch_teachers 50 --dataset celebA-gender-train --train --sigma_thresh 3000 --sigma 1000 --step_size 1e-4 --max_eps 1 --nopretrain --z_dim 100 --batch_size 64
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name] --teachers_batch 80 --batch_teachers 50 --dataset celebA-gender-train --train --sigma_thresh 3000 --sigma 1000 --step_size 1e-4 --max_eps 1 --nopretrain --z_dim 100 --batch_size 26 --resample
+# ================
+
+
+
+
+
+
+
+## DataLens ======
+[MNIST, eps=10]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name]/ --topk 300 --signsgd --norandom_proj --shuffle  --teachers_batch 80 --batch_teachers 50 --dataset mnist --train --max_eps 10 --train --thresh 0.2 --sigma 800 --nopretrain --z_dim 50 --nosave_epoch --epoch 300 --nosave_vote --pretrain_teacher 10 --d_step 2 --stochastic --max_grad 1e-5 --binary
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name]/ --topk 300 --signsgd --norandom_proj --shuffle  --teachers_batch 80 --batch_teachers 50 --dataset mnist --train --max_eps 10 --train --thresh 0.2 --sigma 800 --nopretrain --z_dim 50 --nosave_epoch --epoch 300 --nosave_vote --pretrain_teacher 10 --d_step 2 --stochastic --max_grad 1e-5 --binary --resample --batch_size 15
+
+
+[FashionMNIST, eps=10]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name]/ --topk 350 --signsgd --norandom_proj --shuffle  --teachers_batch 80 --batch_teachers 50 --dataset fmnist --train --max_eps 10 --train --thresh 0.27 --sigma 1000 --nopretrain  --z_dim 64 --nosave_epoch --epoch 300 --nosave_vote --pretrain_teacher 10 --d_step 2 --stochastic --max_grad 1e-5 --binary
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name]/ --topk 350 --signsgd --norandom_proj --shuffle  --teachers_batch 80 --batch_teachers 50 --dataset fmnist --train --max_eps 10 --train --thresh 0.27 --sigma 1000 --nopretrain  --z_dim 64 --nosave_epoch --epoch 300 --nosave_vote --pretrain_teacher 10 --d_step 2 --stochastic --max_grad 1e-5 --binary --resample --batch_size 14
+
+
+[small-celebA-gender, eps=1]
+base:  
+python main.py --checkpoint_dir [base_ckpt_dir_name]/ --topk 700 --signsgd --norandom_proj --noshuffle  --teachers_batch 100 --batch_teachers 60 --dataset small-celebA-gender-train --max_eps 1 --train --thresh 0.85 --sigma 9000 --nopretrain --z_dim 100 --epoch 300 --nosave_vote --d_step 2 --pretrain_teacher 30 --stochastic --max_grad 1e-5
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name]/ --topk 700 --signsgd --norandom_proj --noshuffle  --teachers_batch 100 --batch_teachers 60 --dataset small-celebA-gender-train --max_eps 1 --train --thresh 0.85 --sigma 9000 --nopretrain --z_dim 100 --epoch 300 --nosave_vote --d_step 2 --pretrain_teacher 30 --stochastic --max_grad 1e-5 --resample --batch_size 20
+
+[large-celebA-gender, eps=1]
+base:
+python main.py --checkpoint_dir [base_ckpt_dir_name]/ --topk 700 --signsgd --norandom_proj --noshuffle  --teachers_batch 100 --batch_teachers 60 --dataset celebA-gender-train --train --max_eps 1 --train --thresh 0.85 --sigma 9000 --nopretrain --z_dim 100 --epoch 300 --nosave_vote --d_step 2 --pretrain_teacher 30 --stochastic --max_grad 1e-5
+
+PFGuard:
+python main.py --checkpoint_dir [PFGuard_ckpt_dir_name]/ --topk 700 --signsgd --norandom_proj --noshuffle  --teachers_batch 100 --batch_teachers 60 --dataset celebA-gender-train --train --max_eps 1 --train --thresh 0.85 --sigma 9000 --nopretrain --z_dim 100 --epoch 300 --nosave_vote --d_step 2 --pretrain_teacher 30 --stochastic --max_grad 1e-5 --resample --batch_size 20
+## ===================
+
+
+
+## GS-WGAN =====
+[binary]
+- FashionMNIST
+base:
+python main.py -gpu 0 -ldir [pretrain_dir] -dpath ../../dataset/fmnist/rotated/fmnist_71_subgroup_bias_4 -name base_class -data fmnist
+
+PFGuard: 
+python main.py -gpu 0 -ldir [pretrain_dir] -dpath ../../dataset/fmnist/rotated/fmnist_71_subgroup_bias_4 -name pfguard_class -data fmnist --resample
+
+- MNIST
+base:
+python main.py -gpu 0 -ldir [pretrain_dir] -dpath ../../dataset/mnist/rotated/mnist_31_subgroup_bias_4 -name base_class
+
+PFGuard:
+python main.py -gpu 0 -ldir [pretrain_dir] -dpath ../../dataset/mnist/rotated/mnist_31_subgroup_bias_4 -name pfguard_class --resample
+
+
+[multiclass]
+base: 
+python main.py --multiclass -gpu 0 -ldir [pretrain_dir] --bias_level 7 -name base_bias_7
+
+PFGuard: 
+python main.py --multiclass -gpu 0 -ldir [pretrain_dir] --bias_level 7 -name pfguard_bias_7 --resample

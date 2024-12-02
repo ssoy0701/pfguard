@@ -1,4 +1,4 @@
-fpguard/tabular_experiment/private-data-generation/evaluate.py# Copyright 2019 RBC
+# Copyright 2019 RBC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,16 +24,11 @@ from sklearn import preprocessing
 from fairlearn.metrics import demographic_parity_difference, equalized_odds_difference
 from scipy.special import expit, logit
 from models import dp_wgan, pate_gan, ron_gauss
-from models.Private_PGM import private_pgm
 import argparse
 import numpy as np
 import pandas as pd
 import collections
 import os
-try:
-    from models.IMLE import imle
-except ImportError as error:
-    pass
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 import torch
 
@@ -209,24 +204,6 @@ elif opt.model == 'dp-wgan':
 elif opt.model == 'ron-gauss':
     model = ron_gauss.RONGauss(z_dim, opt.target_epsilon, opt.target_delta, conditional)
 
-elif opt.model == 'imle':
-    Hyperparams = collections.namedtuple(
-        'Hyperarams',
-        'lr batch_size micro_batch_size sigma num_epochs class_ratios clip_coeff decay_step decay_rate staleness num_samples_factor')
-    Hyperparams.__new__.__defaults__ = (None, None, None, None, None, None, None, None)
-
-    model = imle.IMLE(input_dim, z_dim, opt.target_epsilon, opt.target_delta, conditional)
-    model.train(X_train, y_train, Hyperparams(lr=1e-3, batch_size=opt.batch_size, micro_batch_size=opt.micro_batch_size,
-                                              sigma=opt.sigma, num_epochs=opt.num_epochs, class_ratios=class_ratios,
-                                              clip_coeff=opt.clip_coeff, decay_step=opt.decay_step,
-                                              decay_rate=opt.decay_rate, staleness=opt.staleness,
-                                              num_samples_factor=opt.num_samples_factor), private=opt.enable_privacy)
-
-elif opt.model == 'private-pgm':
-    if not conditional:
-        raise Exception('Private PGM cannot be used to generate data for regression')
-    model = private_pgm.Private_PGM(opt.target_variable, opt.target_epsilon, opt.target_delta)
-    model.train(train, config)
 
 # Generating synthetic data from the trained model
 if opt.model == 'real-data':
