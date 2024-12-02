@@ -1,0 +1,14 @@
+NCE Loss for Bayes Optimal Classifier: 0.642
+NCE Loss for Our Classifier: 0.651
+
+Ratio Info:
+	Max: 2.8841975 4.274809 2.9651575 3.649498
+	Mean: 0.68055415 2.452748 0.6464563 2.105421
+
+Total Dataset Size: 73572
+	Major Class 3: 36786
+		Clean: 29430
+		Rotated: 7356
+	Minor Class 1: 36786
+		Clean: 29430
+		Rotated: 7356
