@@ -30,6 +30,7 @@ from torch.utils.data.sampler import SubsetRandomSampler, WeightedRandomSampler
 import time
 
 
+# pfguard ===
 def get_imp_sir_weight(idx, ratio):
     ratio_mask = (
         torch.ones_like(ratio)
@@ -41,7 +42,7 @@ def get_imp_sir_weight(idx, ratio):
     s_i = ratio_sum - ratios
     ratio_new = ratios / s_i
     return ratio_new / ratio_new.sum()
-
+# ======
 
 class PATE_GAN:
     def __init__(self, input_dim, z_dim, num_teachers, target_epsilon, target_delta, conditional=True):
@@ -60,6 +61,8 @@ class PATE_GAN:
         self.target_delta = target_delta
         self.conditional = conditional
 
+
+    # pfguard : add resample ===
     def train(self,  x_train, y_train, hyperparams):
         batch_size = hyperparams.batch_size
         num_teacher_iters = hyperparams.num_teacher_iters
@@ -98,13 +101,15 @@ class PATE_GAN:
                     self.num_teachers - 1) else len(tensor_data)
 
             if hyperparams.resample:
-                # print("Using resampling!!!!!")
+                
+                # pfguard ===
                 train_loader.append(data_utils.DataLoader(torch.utils.data.Subset( \
                     tensor_data, range(int(start_id), int(end_id))), \
                     batch_size=batch_size, \
                     sampler=WeightedRandomSampler(
                         train_ratio[int(start_id):int(end_id)], batch_size
                     )))
+                # ======
             else:
                 train_loader.append(data_utils.DataLoader(torch.utils.data.Subset( \
                     tensor_data, range(int(start_id), int(end_id))), batch_size=batch_size, shuffle=True))
@@ -199,49 +204,6 @@ class PATE_GAN:
 
             steps += 1
 
-            # if steps % 50 == 0:
-
-            #     # generate synthetic data
-            #     class_ratio_np = class_ratios.cpu().numpy()
-            #     syn_data = self.generate(x_train.shape[0], class_ratio_np)
-            #     X_syn, y_syn = syn_data[:, :-1], syn_data[:, -1]
-
-            #     names = ['LR', 'Random Forest', 'Neural Network', 'GaussianNB', 'GradientBoostingClassifier']
-            #     learners = []
-            #     learners.append((LogisticRegression()))
-            #     learners.append((RandomForestClassifier()))
-            #     learners.append((MLPClassifier(early_stopping=True)))
-            #     learners.append((GaussianNB()))
-            #     learners.append((GradientBoostingClassifier()))
-
-            #     print("AUC scores of downstream classifiers on test data : ")
-            #     for i in range(0, len(learners)):
-            #         score = learners[i].fit(X_syn, y_syn)
-            #         pred_probs = learners[i].predict_proba(x_test)
-            #         y_pred = learners[i].predict(x_test)
-            #         auc_score = roc_auc_score(y_test, pred_probs[:, 1])
-            #         # dp_score = demographic_parity_difference(y_test, y_pred, sensitive_features=z_test)
-            #         # eo_score = equalized_odds_difference(y_test, y_pred, sensitive_features=z_test)
-            #         positive_rate_group_0 = np.mean(y_pred[z_test == 0])
-            #         positive_rate_group_1 = np.mean(y_pred[z_test == 1])
-            #         dp_diff = abs(positive_rate_group_0 - positive_rate_group_1)
-
-            #         true_positive_group_0 = np.mean(y_pred[(z_test == 0) & (y_test == 1)])
-            #         true_positive_group_1 = np.mean(y_pred[(z_test == 1) & (y_test == 1)])
-            #         eo_diff = abs(true_positive_group_0 - true_positive_group_1)
-                    
-            #         print('-' * 40)
-            #         print('[{0}] AUROC: {1}'.format(names[i], auc_score))
-            #         print('[{0}] Demographic Parity: {1}'.format(names[i], dp_diff))
-            #         print('[{0}] Equalized Odds: {1}'.format(names[i], eo_diff))
-
-            #         # open file to write the results
-            #         with open(f'results_pategan.txt', 'a') as f:
-            #             f.write('-' * 40 + '\n')
-            #             f.write(f'steps: {steps}\n')
-            #             f.write(f'[{names[i]}] AUROC: {auc_score}\n')
-            #             f.write(f'[{names[i]}] Demographic Parity: {dp_diff}\n')
-            #             f.write(f'[{names[i]}] Equalized Odds: {eo_diff}\n')
 
 
     def generate(self, num_rows, class_ratios, batch_size=1000):

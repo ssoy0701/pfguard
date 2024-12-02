@@ -162,9 +162,8 @@ if opt.normalize_data:
 
 input_dim = X_train.shape[1]
 z_dim = int(input_dim / 4 + 1) if input_dim % 4 == 0 else int(input_dim / 4)
-
+# pfguard =====
 print(np.unique(Z_train, return_counts = True))
-
 print("Example data: ", X_train[:5])
 
 with open(f'results_{opt.name}.txt', 'a') as f:
@@ -175,7 +174,7 @@ with open(f'results_{opt.name}.txt', 'a') as f:
 
     elif opt.model == 'dp-wgan':
         f.write(f'[Sigma = {opt.sigma}]\n')
-    # f.write(f'count: {count}\n') 
+# ========
 
 
 
@@ -190,6 +189,7 @@ if opt.model == 'pate-gan':
     Hyperparams.__new__.__defaults__ = (None, None, None, None, None, None, None, None)
 
     model = pate_gan.PATE_GAN(input_dim, z_dim, opt.num_teachers, opt.target_epsilon, opt.target_delta, conditional)
+    # pfguard: add resample =====
     model.train(X_train, y_train, Hyperparams(batch_size=opt.batch_size, num_teacher_iters=opt.teacher_iters,
                                               num_student_iters=opt.student_iters, num_moments=opt.num_moments,
                                               lap_scale=opt.lap_scale, class_ratios=class_ratios, lr=1e-4, resample=opt.resample))
@@ -204,7 +204,7 @@ elif opt.model == 'dp-wgan':
     model.train(X_test, y_test, Z_test, X_train, y_train, Hyperparams(batch_size=opt.batch_size, micro_batch_size=opt.micro_batch_size,
                                               clamp_lower=opt.clamp_lower, clamp_upper=opt.clamp_upper,
                                               clip_coeff=opt.clip_coeff, sigma=opt.sigma, class_ratios=class_ratios, lr=
-                                              5e-5, num_epochs=opt.num_epochs), private=opt.enable_privacy, resample=opt.resample)
+                                              5e-5, num_epochs=opt.num_epochs), private=opt.enable_privacy)
 
 elif opt.model == 'ron-gauss':
     model = ron_gauss.RONGauss(z_dim, opt.target_epsilon, opt.target_delta, conditional)
@@ -252,28 +252,16 @@ elif opt.model == 'ron-gauss':
         X_test = preprocessing.normalize(X_bar)
 
 elif opt.model == 'imle' or opt.model == 'dp-wgan' or opt.model == 'pate-gan':
+
+    # pfguard =====
     syn_data = model.generate(X_train.shape[0], class_ratios)
     X_syn, y_syn = syn_data[:, :-1], syn_data[:, -1]
-    print(X_syn.shape)
-
-    # count number of X_syn[:5] samples that are greater than mean
-    
     print("Example: ", X_syn[:5])
-    print("Data distribution: ")
+    print("!!Total count: ", X_syn.shape[0])
+
 
     Z_label = np.where(X_syn[:, 5] > 0.5, 1, 0)
-    print("Z count")
-    print(np.unique(Z_label, return_counts = True))
     Y_label = np.where(y_syn > 0.5, 1, 0)
-    print("Y count")
-    print(np.unique(Y_label, return_counts = True))
-
-    # y_syn = Y_label
-
-    
-    
-
-    print("!!Total count: ", X_syn.shape[0])
     pairs = np.stack((Y_label, Z_label), axis=1)  # Create pair array
     unique_pairs, counts = np.unique(pairs, axis=0, return_counts=True)
     print("!!Unique pairs: ", unique_pairs)
@@ -285,16 +273,15 @@ elif opt.model == 'private-pgm':
     X_syn, y_syn = syn_data[:, :-1], syn_data[:, -1]
 
 Z_label = np.where(X_syn[:, 5] > 0.5, 1, 0)
-print("Z count")
-print(np.unique(Z_label, return_counts = True))
 Y_label = np.where(y_syn > 0.5, 1, 0)
-print("Y count")
-print(np.unique(Y_label, return_counts = True))
-print("!!Total count: ", X_syn.shape[0])
+
 pairs = np.stack((Y_label, Z_label), axis=1)  # Create pair array
 unique_pairs, counts = np.unique(pairs, axis=0, return_counts=True)
 print("!!Unique pairs: ", unique_pairs)
 print("!!Counts: ", counts)
+with open(f'results_{opt.name}.txt', 'a') as f:
+    f.write(f'count: {counts}\n')
+# =============
 
 # Testing the quality of synthetic data by training and testing the downstream learners
 
@@ -320,17 +307,16 @@ if opt.downstream_task == "classification":
         print("Y_Pred: ", y_pred[:10])
         print("Z_REAL: ", Z_test[:10])
 
-        # dp_score = demographic_parity_difference(y_test, y_pred, sensitive_features=Z_test)
-        # eo_score = equalized_odds_difference(y_test, y_pred, sensitive_features=Z_test)
 
         print('-' * 40)
         print('[{0}] AUROC: {1}'.format(names[i], auc_score))
-        # print('[{0}] Demographic Parity: {1}'.format(names[i], dp_score))
+
+        # pfguard =====
         positive_rate_group_0 = np.mean(y_pred[Z_test == 0])
         positive_rate_group_1 = np.mean(y_pred[Z_test == 1])
         dp_diff = abs(positive_rate_group_0 - positive_rate_group_1)
         print(f'Demographic parity difference: {dp_diff}')
-        # print('[{0}] Equalized Odds: {1}'.format(names[i], eo_score))
+
 
         true_positive_group_0 = np.mean(y_pred[(Z_test == 0) & (y_test == 1)])
         true_positive_group_1 = np.mean(y_pred[(Z_test == 1) & (y_test == 1)])
@@ -342,7 +328,7 @@ if opt.downstream_task == "classification":
             f.write(f'[{names[i]}] AUROC: {auc_score}\n')
             f.write(f'[{names[i]}] Demographic Parity: {dp_diff}\n')
             f.write(f'[{names[i]}] Equalized Odds: {eo_diff}\n')
-            # f.write(f'count: {count}\n') 
+        # =============
 
 
 else:
