@@ -7,7 +7,7 @@ This repo contains codes used in the arXiv paper: [PFGuard: A Generative Framewo
 
 *Abstract: Generative models must ensure both privacy and fairness for Trustworthy AI. While these goals have been pursued separately, recent studies propose to combine existing privacy and fairness techniques to achieve both goals. However, naively combining these techniques can be insufficient due to privacy-fairness conflicts, where a sample in a minority group may be amplified for fairness, only to be suppressed for privacy. We demonstrate how these conflicts lead to adverse effects, such as privacy violations and unexpected fairness-utility tradeoffs. To mitigate these risks, we propose PFGuard, a generative framework with privacy and fairness safeguards, which simultaneously addresses privacy, fairness, and utility. By using an ensemble of multiple teacher models, PFGuard balances privacy-fairness conflicts between fair and private training stages and achieves high utility based on ensemble learning. Extensive experiments show that PFGuard successfully generates synthetic data on high-dimensional data while providing both convergence in fair generative modeling and strict DP guarantees - the first of its kind to our knowledge.*
 
-
+<!--
 ## Setting
 This directory is for simulating FairBatch on the synthetic dataset.
 The program needs PyTorch and Jupyter Notebook.
@@ -52,3 +52,4 @@ year={2021},
 url={https://openreview.net/forum?id=YNnpaAKeCfx}
 }
 ```
+-->
